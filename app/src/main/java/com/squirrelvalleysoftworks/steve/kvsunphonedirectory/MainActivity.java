@@ -18,8 +18,6 @@ import android.widget.Spinner;
 
 public class MainActivity extends ActionBarActivity {
     SearchHandler searchHandler = null;//This should be instant. before onCreate
-    public int mainViewHeight;
-    public int mainViewWidth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,11 +117,6 @@ public class MainActivity extends ActionBarActivity {
 //                mainLayout.requestFocus();
             }
         });
-
-        mainViewHeight = findViewById(R.id.layout).getHeight();
-        mainViewWidth  = findViewById(R.id.layout).getWidth();
-        System.out.println("THE MAIN HEIGHT NIGGZ!");
-        System.out.println(mainViewHeight);
     }
 
     @Override
