@@ -1,5 +1,6 @@
 package com.squirrelvalleysoftworks.steve.kvsunphonedirectory;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,15 +10,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class MainActivity extends ActionBarActivity {
     SearchHandler searchHandler = null;//This should be instant. before onCreate
+    int mainViewHeight = 0;
+    int mainViewWidth = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +98,7 @@ public class MainActivity extends ActionBarActivity {
                 try {
                     if (query.charAt(query.length() - 1) == ' ')//wanting to scrape off trailing space
                         query.substring(0, query.length() - 2);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     System.err.println("index out of bounds, ignoring");
                 }
 
@@ -117,6 +125,44 @@ public class MainActivity extends ActionBarActivity {
 //                mainLayout.requestFocus();
             }
         });
+
+        //Going to use this to keep the mainViews height and width updated with the max
+        View mainView = findViewById(R.id.layout);
+        mainView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (left == 0 && top == 0 && right == 0 && bottom == 0) {
+                    return;
+                } else {
+                    int width = right;
+                    int height = bottom;
+
+                    if (width > mainViewWidth)
+                        mainViewWidth = width;
+                    if (height > mainViewHeight)
+                        mainViewHeight = height;
+
+                    System.out.println("Main layout has changed");
+                    System.out.println(left);
+                    System.out.println(top);
+                    System.out.println(right);
+                    System.out.println(bottom);
+
+                }
+            }
+        });
+
+        //Setup background changing timer
+        Timer backgroundTimer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                //change background
+                //Need to do a fade transition
+            }
+        };
+        backgroundTimer.schedule(task, 1000 * 30, 1000 * 30);
     }
 
     @Override
@@ -153,4 +199,11 @@ public class MainActivity extends ActionBarActivity {
             findViewById(R.id.dimmer).setVisibility(View.GONE);
     }
 
+    private void fadeOutBackground() {
+
+    }
+
+    private void fadeInBackground() {
+        
+    }
 }

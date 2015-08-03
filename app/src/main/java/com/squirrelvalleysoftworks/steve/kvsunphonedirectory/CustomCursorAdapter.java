@@ -3,6 +3,7 @@ package com.squirrelvalleysoftworks.steve.kvsunphonedirectory;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -72,6 +73,8 @@ public class CustomCursorAdapter extends BaseAdapter {
             convertView = generateBannerView(row);
         else
             convertView = generateStandardView(row);
+
+        //Display popup when pressing resultsEntry
         convertView.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -86,8 +89,11 @@ public class CustomCursorAdapter extends BaseAdapter {
                 final PopupWindow pw = new PopupWindow(
                         inflator.inflate(R.layout.popup_result_view, null, false),
                         ((Activity) context).findViewById(R.id.resultsView).getWidth(),
-                        mainView.getHeight(),
+                        ((MainActivity) context).mainViewHeight / 2, //half as tall as the max of main view
                         true);
+                System.out.print("Popup will be using height ");
+                System.out.println(((MainActivity) context).mainViewHeight / 2);
+
                 TextView popupTextView = (TextView) pw.getContentView().findViewById(R.id.popupTextView);
                 popupTextView.setText(row.allLines);
                 popupTextView.setMovementMethod(new ScrollingMovementMethod());
