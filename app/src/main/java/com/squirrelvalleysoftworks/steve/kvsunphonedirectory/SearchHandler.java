@@ -3,6 +3,7 @@ package com.squirrelvalleysoftworks.steve.kvsunphonedirectory;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import java.util.Arrays;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -23,11 +24,12 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class SearchHandler extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "entries.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 4;
     private final SQLiteDatabase db;
 
     public SearchHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        setForcedUpgrade();
         db = getReadableDatabase();
     }
 
@@ -54,6 +56,14 @@ public class SearchHandler extends SQLiteAssetHelper {
         return c;
     }
 
+    public void sanityCheck() {
+        System.out.println("SANITY CHECK");
+        String baseQuery = "select rowid as _id,* from Entries";
 
+        Cursor c = db.rawQuery(baseQuery, null); //_id necessary for adapters
+        System.out.println(c.getColumnIndexOrThrow("bannerPath"));
+        System.out.println(Arrays.toString(c.getColumnNames()));
+
+    }
 
 }

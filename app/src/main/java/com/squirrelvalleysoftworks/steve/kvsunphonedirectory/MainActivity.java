@@ -25,13 +25,14 @@ public class MainActivity extends ActionBarActivity {
     SearchHandler searchHandler = null;//This should be instant. before onCreate
     int mainViewHeight = 0;
     int mainViewWidth = 0;
-
+    final static long BACKGROUND_TIMEOUT = 2000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         searchHandler = new SearchHandler(this);
+        searchHandler.sanityCheck();
 
         //Initialize layout components
         //Why must these be final?

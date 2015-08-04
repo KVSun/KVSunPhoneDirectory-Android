@@ -3,6 +3,7 @@ package com.squirrelvalleysoftworks.steve.kvsunphonedirectory;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
@@ -11,11 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Field;
 import java.util.Objects;
 
 /**
@@ -69,10 +72,11 @@ public class CustomCursorAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         final CursorRow row = getRowAtPosition(cursor, position);
         //We'll be lazy for now, eventually implement recycling of views, use tags & holders
-        if(row.bannerPath == "")
-            convertView = generateBannerView(row);
-        else
+        if(row.bannerPath.equals("no path entered"))
             convertView = generateStandardView(row);
+        else
+            convertView = generateBannerView(row);
+
 
         //Display popup when pressing resultsEntry
         convertView.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +122,29 @@ public class CustomCursorAdapter extends BaseAdapter {
     }
 
     View generateBannerView(CursorRow row) {
-        return null;
+//        able_property_management.jpg
+        View returnView = inflator.inflate(R.layout.banner_result_view, null);
+        ImageView bannerImageView = (ImageView) returnView.findViewById(R.id.bannerImageView);
+        //Find resource id
+        int bannerID = -1;
+        try {
+            Field idField = R.drawable.class.getDeclaredField(row.bannerPath);
+            bannerID = idField.getInt(idField);
+        } catch(Exception e) {
+            System.out.println("CRASH");
+            System.out.println("Path:" + row.bannerPath + ";");
+            Field fields[] = Drawable.class.getDeclaredFields();
+            System.out.println("FIELDS:");
+            for(Field f: fields) {
+                System.out.println(f.toString());
+            }
+            System.out.println("IS KILL");
+            throw new RuntimeException("Crash when trying to get banner R.id");
+        }
+
+        bannerImageView.setImageResource(bannerID);
+
+        return returnView;
     }
 
     View generateStandardView(CursorRow row) {
@@ -131,11 +157,6 @@ public class CustomCursorAdapter extends BaseAdapter {
             viewPhoneNumberTextView.setText("...");
         else
             viewPhoneNumberTextView.setText(row.associatedNumbers);
-
-        //Build and assign popup view
-
-
-        //Will eventually need to put in place a click listener
 
         return returnView;
     }

@@ -2,17 +2,27 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".FrontActivity"
-    android:background="@drawable/kern_river_valley"
     style="@style/AppTheme"
     android:clickable="false"
     android:id="@+id/layout">
 
 
+    <!-- Dimmer layout-->
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/backgroundView"
+        android:src="@drawable/kv_crop_correct"
+        android:scaleType="fitXY"
+        android:contentDescription="background" />
+
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="15dp"
-        android:id="@+id/paddedLayout">
+        android:id="@+id/paddedLayout"
+        android:background="#00ffffff">
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -49,15 +59,10 @@
                 android:id="@+id/resultsView"
                 android:layout_gravity="center_horizontal"
                 android:background="#CCFFffff" />
-            <TextView android:id="@android:id/empty"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#FF0000"
-                android:text="No data"/>
 
         </LinearLayout>
     </RelativeLayout>
-    <!-- Dimmer layout-->
+
     <RelativeLayout
         android:id="@+id/dimmer"
         android:layout_width="match_parent"
