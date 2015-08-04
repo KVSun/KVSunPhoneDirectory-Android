@@ -15,7 +15,12 @@
         android:layout_alignParentStart="true"
         android:layout_above="@+id/closePopupButton"
         android:scrollbars="vertical"
-        android:maxLines="5000" />
+        android:maxLines="5000"
+        android:textIsSelectable="true"
+        android:autoLink="all"
+        android:textSize="20dp"
+        android:layout_margin="10dp" />
+
 
     <Button
         android:layout_width="wrap_content"
@@ -23,5 +28,6 @@
         android:text="close"
         android:id="@+id/closePopupButton"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:theme="@style/Widget.AppCompat.Button.Borderless" />
 </RelativeLayout>
