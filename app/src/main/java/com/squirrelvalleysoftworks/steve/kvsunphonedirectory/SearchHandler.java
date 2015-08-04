@@ -3,6 +3,8 @@ package com.squirrelvalleysoftworks.steve.kvsunphonedirectory;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
@@ -24,7 +26,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class SearchHandler extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "entries.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 6;
     private final SQLiteDatabase db;
 
     public SearchHandler(Context context) {
@@ -43,8 +45,12 @@ public class SearchHandler extends SQLiteAssetHelper {
     }
 
     //Need to implement
-    public Cursor searchByCategory(String name) {
-        return null;
+    public Cursor searchByCategory(String category) {
+        String query = "SELECT Entries.rowid as _id,Entries.* from Entries, Categories where " +
+                "Entries.displayName = Categories.displayName and Categories.category = " + '"' + category + '"';
+        System.out.println(query);
+        Cursor c = db.rawQuery(query, null);
+        return c;
     }
 
     public Cursor searchByNumber(String number) {
@@ -58,12 +64,27 @@ public class SearchHandler extends SQLiteAssetHelper {
 
     public void sanityCheck() {
         System.out.println("SANITY CHECK");
-        String baseQuery = "select rowid as _id,* from Entries";
+        String baseQuery = "select rowid as _id,* from Categories";
 
         Cursor c = db.rawQuery(baseQuery, null); //_id necessary for adapters
-        System.out.println(c.getColumnIndexOrThrow("bannerPath"));
-        System.out.println(Arrays.toString(c.getColumnNames()));
+        dumpCursorRows(c);
+    }
 
+    public Cursor getCategoriesListCursor(String category) {
+        String query = "SELECT rowid as _id,* FROM CategoriesList WHERE category LIKE ";
+        query = query + "'%" + category + "%'";
+        Cursor c = db.rawQuery(query, null);
+        return c;
+    }
+
+    public void dumpCursorRows(Cursor c) {
+        c.moveToFirst();
+        int i = 0;
+        System.out.println("CURSOR DUMP");
+        while(c.moveToNext()) {
+            System.out.println(i);
+            System.out.println("    " + c.getString(1) + " : " + c.getString(2));
+        }
     }
 
 }

@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -26,23 +28,28 @@ public class MainActivity extends ActionBarActivity {
     int mainViewHeight = 0;
     int mainViewWidth = 0;
     final static long BACKGROUND_TIMEOUT = 2000;
+    private SearchView queryView;
+    private RelativeLayout mainLayout;
+    private Spinner categorySpinner;
+    private ListView resultsView;
+    private Context mainActivityContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         searchHandler = new SearchHandler(this);
-        searchHandler.sanityCheck();
+
 
         //Initialize layout components
         //Why must these be final?
         //  inner classes?
-        final SearchView queryView = (SearchView) findViewById(R.id.queryView);
-        final RelativeLayout mainLayout = (RelativeLayout) findViewById(R.id.layout);
-        final Spinner categorySpinner = (Spinner) findViewById(R.id.categorySpinner);
-        final ListView resultsView = (ListView) findViewById(R.id.resultsView);
-        final Context MainActivityContext = this; //A cheat to get the context to inner class
-
+        queryView = (SearchView) findViewById(R.id.queryView);
+        mainLayout = (RelativeLayout) findViewById(R.id.layout);
+        categorySpinner = (Spinner) findViewById(R.id.categorySpinner);
+        resultsView = (ListView) findViewById(R.id.resultsView);
+        mainActivityContext = this;
 
         //Spinner set up
         //spinner items should be factored out as resources
@@ -50,12 +57,17 @@ public class MainActivity extends ActionBarActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
+        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                displayResults(queryView.getQuery().toString());
+            }
 
-
-
-
-
-
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                return;
+            }
+        });
 
         //Used so that queryView collapses when pressing the main layout
         mainLayout.setOnClickListener(new View.OnClickListener() {
@@ -80,6 +92,10 @@ public class MainActivity extends ActionBarActivity {
         });
 
         queryView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            public void simulateClick() {
+                displayResults(queryView.getQuery().toString());
+            }
+
             @Override
             public boolean onQueryTextSubmit(String query) {
                 displayResults(query);
@@ -90,40 +106,6 @@ public class MainActivity extends ActionBarActivity {
             public boolean onQueryTextChange(String newText) {
                 displayResults(newText);
                 return false;
-            }
-
-            private void displayResults(String query) {
-                System.out.println("Query submitted: " + query);
-                String spinnerText = categorySpinner.getSelectedItem().toString();
-                Cursor resultsCursor = null;
-                try {
-                    if (query.charAt(query.length() - 1) == ' ')//wanting to scrape off trailing space
-                        query.substring(0, query.length() - 2);
-                } catch (Exception e) {
-                    System.err.println("index out of bounds, ignoring");
-                }
-
-                switch (spinnerText) {
-                    case "Search By Name":
-                        resultsCursor = searchHandler.searchByName(query);
-                        break;
-                    case "Search By Category":
-                        resultsCursor = searchHandler.searchByCategory(query);
-                        break;
-                    case "Search By Number":
-                        resultsCursor = searchHandler.searchByNumber(query);
-                        break;
-                    default:
-                        System.err.println("Category was not matched, crashing");
-                        throw new RuntimeException("Crashed within spinner category selection");
-                }
-
-
-                //resultsView setup
-                CustomCursorAdapter adapter = new CustomCursorAdapter(MainActivityContext, resultsCursor);
-                resultsView.setAdapter(adapter);
-//                queryView.clearFocus();
-//                mainLayout.requestFocus();
             }
         });
 
@@ -206,5 +188,44 @@ public class MainActivity extends ActionBarActivity {
 
     private void fadeInBackground() {
         
+    }
+
+    public void handleCategory(String category) {
+        ListView resultsView = (ListView)findViewById(R.id.resultsView);
+        Cursor c = searchHandler.searchByCategory(category);
+        resultsView.setAdapter(new CustomCursorAdapter(this, c));
+    }
+
+    private void displayResults(String query) {
+        System.out.println("Query submitted: " + query);
+        String spinnerText = categorySpinner.getSelectedItem().toString();
+        Cursor resultsCursor = null;
+        BaseAdapter adapter = null;
+        try {
+            if (query.charAt(query.length() - 1) == ' ')//wanting to scrape off trailing space
+                query.substring(0, query.length() - 2);
+        } catch (Exception e) {
+            System.err.println("index out of bounds, ignoring");
+        }
+
+        switch (spinnerText) {
+            case "Search By Name":
+                resultsCursor = searchHandler.searchByName(query);
+                adapter = new CustomCursorAdapter(mainActivityContext, resultsCursor);
+                break;
+            case "Search By Category":
+                resultsCursor = searchHandler.getCategoriesListCursor(query);
+                adapter = new CategoryCursorAdapter(mainActivityContext, resultsCursor);
+                break;
+            case "Search By Number":
+                resultsCursor = searchHandler.searchByNumber(query);
+                adapter = new CustomCursorAdapter(mainActivityContext, resultsCursor);
+                break;
+            default:
+                System.err.println("Category was not matched, crashing");
+                throw new RuntimeException("Crashed within spinner category selection");
+        }
+
+        resultsView.setAdapter(adapter);
     }
 }

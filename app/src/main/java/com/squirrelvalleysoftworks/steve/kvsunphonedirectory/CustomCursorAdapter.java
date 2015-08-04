@@ -56,6 +56,8 @@ public class CustomCursorAdapter extends BaseAdapter {
         this.cursor = cursor;
         inflator = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
+
+
     @Override
     public int getCount() {
         return cursor.getCount();
