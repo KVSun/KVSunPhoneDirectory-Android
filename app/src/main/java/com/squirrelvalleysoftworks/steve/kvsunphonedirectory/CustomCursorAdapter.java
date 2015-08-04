@@ -3,6 +3,9 @@ package com.squirrelvalleysoftworks.steve.kvsunphonedirectory;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.provider.Settings;
 import android.text.method.ScrollingMovementMethod;
@@ -32,12 +35,11 @@ public class CustomCursorAdapter extends BaseAdapter {
     //These are necessary for reusing Views within the listView, its good practice!
     //Maintains a representation for the banner views
     private class bannerHolder {
-
+        ImageView bannerImageView = null;
     }
 
     //Maintains a representation for the standard views
     private class standardHolder {
-
     }
 
     private class CursorRow {
@@ -71,12 +73,36 @@ public class CustomCursorAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final CursorRow row = getRowAtPosition(cursor, position);
-        //We'll be lazy for now, eventually implement recycling of views, use tags & holders
-        if(row.bannerPath.equals("no path entered"))
-            convertView = generateStandardView(row);
-        else
-            convertView = generateBannerView(row);
 
+        //Instantiate if view is empty
+        if(convertView != null) {
+            System.out.println("NON NULL ENTERED");
+            if(convertView.getTag().equals("banner")) {
+                System.out.println("RECYCLING BITMAP");
+                ImageView imageView = (ImageView) convertView.findViewById(R.id.bannerImageView);
+                Drawable imageViewDrawable = imageView.getDrawable();
+                ((BitmapDrawable) imageViewDrawable).getBitmap().recycle();//WHY WONT YOU FUCKING DIE
+                System.gc();
+            } else if(convertView.getTag().equals("standard")) {
+                System.out.println("CONVERT STANDARD");
+            } else {
+                System.out.println("NOT SURE WHAT WE GOT");
+            }
+        }
+
+        //Now actually create the views
+        if(row.bannerPath.equals("no path entered")) {
+            if(convertView == null || !(convertView.getTag().equals("standard")))//wrong type of view
+                convertView = inflator.inflate(R.layout.standard_result_view, null);
+            convertView.setTag("standard");
+            convertView = generateStandardView(row, convertView);
+        } else {
+            if (convertView == null || !(convertView.getTag().equals("banner")))
+                convertView = inflator.inflate(R.layout.banner_result_view, null);
+            convertView.setTag("banner");
+            convertView = generateBannerView(row, convertView);
+        }
+        System.gc();
 
         //Display popup when pressing resultsEntry
         convertView.setOnClickListener(new View.OnClickListener() {
@@ -88,7 +114,7 @@ public class CustomCursorAdapter extends BaseAdapter {
 
                 //Try to hide the keyboard when popup displays
                 //Also necessary to get correct height (A little hacky here)
-                ((MainActivity)context).clearSearchFocus();
+                ((MainActivity) context).clearSearchFocus();
 
                 final PopupWindow pw = new PopupWindow(
                         inflator.inflate(R.layout.popup_result_view, null, false),
@@ -102,55 +128,66 @@ public class CustomCursorAdapter extends BaseAdapter {
                 popupTextView.setText(row.allLines);
                 popupTextView.setMovementMethod(new ScrollingMovementMethod());
                 pw.showAtLocation(mainView, Gravity.CENTER, 0, 0);
-                ((MainActivity)context).setDim(true);
+                ((MainActivity) context).setDim(true);
                 //bind close button
                 Button closeButton = (Button) pw.getContentView().findViewById(R.id.closePopupButton);
                 closeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         pw.dismiss();
-                        ((MainActivity)context).setDim(false);
+                        ((MainActivity) context).setDim(false);
                     }
                 });
-
-                //necessary due to lag time between keyboard closing and height updating
-//                pw.update(0, 0, ((Activity) context).findViewById(R.id.resultsView).getWidth(),
-//                        mainView.getHeight());
             }
         });
+        System.gc();
         return convertView;
     }
 
-    View generateBannerView(CursorRow row) {
+    View generateBannerView(CursorRow row, View convertView) {
 //        able_property_management.jpg
-        View returnView = inflator.inflate(R.layout.banner_result_view, null);
-        ImageView bannerImageView = (ImageView) returnView.findViewById(R.id.bannerImageView);
+        ImageView bannerImageView = (ImageView) convertView.findViewById(R.id.bannerImageView);
+
+//        bannerHolder holder = new bannerHolder();
+//        holder.bannerImageView = bannerImageView;
+//        convertView.setTag(holder);
+
         //Find resource id
         int bannerID = -1;
         try {
             Field idField = R.drawable.class.getDeclaredField(row.bannerPath);
             bannerID = idField.getInt(idField);
         } catch(Exception e) {
-            System.out.println("CRASH");
-            System.out.println("Path:" + row.bannerPath + ";");
-            Field fields[] = Drawable.class.getDeclaredFields();
-            System.out.println("FIELDS:");
-            for(Field f: fields) {
-                System.out.println(f.toString());
-            }
-            System.out.println("IS KILL");
             throw new RuntimeException("Crash when trying to get banner R.id");
         }
+        //Lets save some bytes
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        options.inDensity = 36;
+        options.inPurgeable = true;
 
-        bannerImageView.setImageResource(bannerID);
+        Bitmap bitMap = BitmapFactory.decodeResource(context.getResources(), bannerID, options);
 
-        return returnView;
+        bannerImageView.setImageBitmap(bitMap);
+        convertView.setTag("banner");
+        return convertView;
     }
 
-    View generateStandardView(CursorRow row) {
-        View returnView = inflator.inflate(R.layout.standard_result_view, null);
-        TextView viewDisplayNameTextView = (TextView) returnView.findViewById(R.id.displayNameView);
-        TextView viewPhoneNumberTextView = (TextView) returnView.findViewById(R.id.phoneNumberView);
+    View generateStandardView(CursorRow row, View convertView) {
+//        if(!(convertView.getTag() instanceof standardHolder)) {
+//            if (convertView.getTag() instanceof bannerHolder)
+//                throw new RuntimeException("bannerView passed");
+//            else
+//                throw new RuntimeException("Something else passed");
+//        }
+
+
+
+        TextView viewDisplayNameTextView = (TextView) convertView.findViewById(R.id.displayNameView);
+        TextView viewPhoneNumberTextView = (TextView) convertView.findViewById(R.id.phoneNumberView);
+
+        if(viewDisplayNameTextView == null)
+            throw new RuntimeException("textview was not set");
 
         viewDisplayNameTextView.setText(row.displayName);
         if(row.hasMultipleNumbers)
@@ -158,8 +195,10 @@ public class CustomCursorAdapter extends BaseAdapter {
         else
             viewPhoneNumberTextView.setText(row.associatedNumbers);
 
-        return returnView;
+        convertView.setTag("standard");
+        return convertView;
     }
+
 
     CursorRow getRowAtPosition(Cursor cursor, int position) {
         CursorRow row = new CursorRow();
