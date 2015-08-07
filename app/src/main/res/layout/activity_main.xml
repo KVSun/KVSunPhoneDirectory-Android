@@ -13,7 +13,6 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/backgroundView"
-        android:src="@drawable/kv_crop_correct"
         android:scaleType="fitXY"
         android:contentDescription="background" />
 

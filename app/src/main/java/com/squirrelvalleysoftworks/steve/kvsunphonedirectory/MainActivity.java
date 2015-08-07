@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -28,16 +32,26 @@ public class MainActivity extends ActionBarActivity {
     int mainViewHeight = 0;
     int mainViewWidth = 0;
     final static long BACKGROUND_TIMEOUT = 2000;
+    long timeOflastPress = -1;
     private SearchView queryView;
     private RelativeLayout mainLayout;
     private Spinner categorySpinner;
     private ListView resultsView;
     private Context mainActivityContext;
+    private double BACKOUT_THRESHHOLD = 250;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ImageView backgroundView = (ImageView)findViewById(R.id.backgroundView);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+        options.inMutable  = true;
+        Bitmap bitMap = BitmapFactory.decodeResource(this.getResources(), R.drawable.background, options);
+        backgroundView.setImageBitmap(bitMap);
 
         searchHandler = new SearchHandler(this);
 
@@ -65,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                return;
+                displayResults(queryView.getQuery().toString());
             }
         });
 
@@ -135,17 +149,6 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         });
-
-        //Setup background changing timer
-        Timer backgroundTimer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                //change background
-                //Need to do a fade transition
-            }
-        };
-        backgroundTimer.schedule(task, 1000 * 30, 1000 * 30);
     }
 
     @Override
@@ -227,5 +230,20 @@ public class MainActivity extends ActionBarActivity {
         }
 
         resultsView.setAdapter(adapter);
+    }
+    @Override
+    public void onBackPressed() {
+        if (timeOflastPress == 0)
+            timeOflastPress = System.currentTimeMillis();
+        else {
+            long currentTime = System.currentTimeMillis();
+            if(currentTime - timeOflastPress <= BACKOUT_THRESHHOLD) {
+                System.exit(0);
+            } else
+                timeOflastPress = currentTime;
+        }
+        queryView.setQuery("", false);
+        queryView.clearFocus();
+        displayResults("");
     }
 }

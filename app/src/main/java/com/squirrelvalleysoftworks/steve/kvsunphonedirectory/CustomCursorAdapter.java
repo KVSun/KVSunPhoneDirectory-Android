@@ -31,6 +31,7 @@ public class CustomCursorAdapter extends BaseAdapter {
     private LayoutInflater inflator = null;
     private Cursor cursor = null;
     private Context context = null;
+//    private byte[] decodeBuffer = new byte[1024*1024*50];//FUCK IT
 
     //These are necessary for reusing Views within the listView, its good practice!
     //Maintains a representation for the banner views
@@ -80,11 +81,18 @@ public class CustomCursorAdapter extends BaseAdapter {
         if(convertView != null) {
             System.out.println("NON NULL ENTERED");
             if(convertView.getTag().equals("banner")) {
-                System.out.println("RECYCLING BITMAP");
-                ImageView imageView = (ImageView) convertView.findViewById(R.id.bannerImageView);
-                Drawable imageViewDrawable = imageView.getDrawable();
-                ((BitmapDrawable) imageViewDrawable).getBitmap().recycle();//WHY WONT YOU FUCKING DIE
-                System.gc();
+                try {
+
+                    System.out.println("RECYCLING BITMAP");
+                    ImageView imageView = (ImageView) convertView.findViewById(R.id.bannerImageView);
+                    Drawable imageViewDrawable = imageView.getDrawable();
+                    ((BitmapDrawable) imageViewDrawable).getBitmap().recycle();//WHY WONT YOU FUCKING DIE
+                    boolean recycled = ((BitmapDrawable) imageViewDrawable).getBitmap().isRecycled();
+                    imageView.setImageBitmap(null);
+                    System.out.println("Actually recycled: " + String.valueOf(recycled));
+
+                    System.gc();
+                } catch(Exception e){}
             } else if(convertView.getTag().equals("standard")) {
                 System.out.println("CONVERT STANDARD");
             } else {
@@ -147,7 +155,6 @@ public class CustomCursorAdapter extends BaseAdapter {
     }
 
     View generateBannerView(CursorRow row, View convertView) {
-//        able_property_management.jpg
         ImageView bannerImageView = (ImageView) convertView.findViewById(R.id.bannerImageView);
 
 //        bannerHolder holder = new bannerHolder();
@@ -165,8 +172,10 @@ public class CustomCursorAdapter extends BaseAdapter {
         //Lets save some bytes
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
-        options.inDensity = 36;
-        options.inPurgeable = true;
+//        options.inDensity = 36;
+        options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+        options.inMutable  = true;
+//        options.inTempStorage = decodeBuffer;
 
         Bitmap bitMap = BitmapFactory.decodeResource(context.getResources(), bannerID, options);
 

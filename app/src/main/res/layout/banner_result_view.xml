@@ -12,6 +12,5 @@
         android:scaleType="fitXY"
         android:layout_alignParentRight="false"
         android:cropToPadding="false"
-        android:src="@drawable/able_property_management"
         android:adjustViewBounds="true" />
 </RelativeLayout>

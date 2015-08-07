@@ -4,9 +4,11 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/app_icon"
+        android:icon="@drawable/icon"
         android:label="KV Sun Phone Directory"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:largeHeap="true" >
+        <!-- forgive me father, for i have sinned-->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >

@@ -1,10 +1,13 @@
 package com.squirrelvalleysoftworks.steve.kvsunphonedirectory;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,6 +21,14 @@ public class splashScreen extends ActionBarActivity {
         setContentView(R.layout.activity_splash_screen);
 
         //Setup timerTask to trigger main activity
+        ImageView backgroundView = (ImageView)findViewById(R.id.splashImageView);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        options.inPreferredConfig = Bitmap.Config.ARGB_4444;
+        options.inMutable  = true;
+        Bitmap bitMap = BitmapFactory.decodeResource(this.getResources(), R.drawable.splash2, options);
+        backgroundView.setImageBitmap(bitMap);
+
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
