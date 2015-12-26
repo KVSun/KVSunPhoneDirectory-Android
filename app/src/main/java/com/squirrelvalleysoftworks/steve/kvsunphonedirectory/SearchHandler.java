@@ -18,6 +18,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 //        to make this folder change view to project, right click main new->folder->assets folder
 
     //When updating be sure to increment the database version!!
+//When shit goes bad: delete assets folder and recreate, make project clean, increment DB version
 
 //This class will return cursors based on the requested search method
 //Will still return a cursor even if nothing is found

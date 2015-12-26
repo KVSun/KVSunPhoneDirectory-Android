@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">KVSunPhoneDirectory</string>
+    <string name="app_name">KVSunDirectory</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_splash_screen">KV Sun Phone Directory</string>
+    <string name="title_activity_splash_screen">KV Sun Directory</string>
 </resources>

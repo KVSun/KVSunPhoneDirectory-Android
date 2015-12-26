@@ -5,7 +5,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/icon"
-        android:label="KV Sun Phone Directory"
+        android:label="KV Sun Directory"
         android:theme="@style/AppTheme"
         android:largeHeap="true"
         android:versionCode="3"
