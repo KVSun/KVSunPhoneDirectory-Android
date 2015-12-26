@@ -7,7 +7,9 @@
         android:icon="@drawable/icon"
         android:label="KV Sun Phone Directory"
         android:theme="@style/AppTheme"
-        android:largeHeap="true" >
+        android:largeHeap="true"
+        android:versionCode="3"
+        >
         <!-- forgive me father, for i have sinned-->
         <activity
             android:name=".MainActivity"
