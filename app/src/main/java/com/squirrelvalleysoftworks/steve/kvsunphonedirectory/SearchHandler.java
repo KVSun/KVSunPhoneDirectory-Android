@@ -4,9 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 /**
@@ -20,13 +17,15 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 //    place the database in app/src/main/assets/databases
 //        to make this folder change view to project, right click main new->folder->assets folder
 
+    //When updating be sure to increment the database version!!
+
 //This class will return cursors based on the requested search method
 //Will still return a cursor even if nothing is found
 //This should be a singleton!
 
 public class SearchHandler extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "entries.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
     private final SQLiteDatabase db;
 
     public SearchHandler(Context context) {
