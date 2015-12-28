@@ -26,7 +26,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 public class SearchHandler extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "entries.db";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
     private final SQLiteDatabase db;
 
     public SearchHandler(Context context) {
