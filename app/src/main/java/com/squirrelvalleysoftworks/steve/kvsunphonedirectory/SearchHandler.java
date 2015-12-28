@@ -38,6 +38,8 @@ public class SearchHandler extends SQLiteAssetHelper {
     public Cursor searchByName(String name){
         String baseQuery = "select rowid as _id,* from Entries where displayName like ";
         String query = baseQuery + "'%" + name + "%'"; //this returns all that has name as a substring
+        query = query + " ORDER BY hasMultipleLines DESC, displayName";
+
 
         Cursor c = db.rawQuery(query, null); //_id necessary for adapters
 
@@ -48,6 +50,7 @@ public class SearchHandler extends SQLiteAssetHelper {
     public Cursor searchByCategory(String category) {
         String query = "SELECT Entries.rowid as _id,Entries.* from Entries, Categories where " +
                 "Entries.displayName = Categories.displayName and Categories.category = " + '"' + category + '"';
+        query = query + " ORDER BY hasMultipleLines DESC, displayName";
         System.out.println(query);
         Cursor c = db.rawQuery(query, null);
         return c;
@@ -56,7 +59,7 @@ public class SearchHandler extends SQLiteAssetHelper {
     public Cursor searchByNumber(String number) {
         String baseQuery = "select rowid as _id,* from Entries where associatedNumbers like ";
         String query = baseQuery + "'%" + number + "%'"; //this returns all that has number as a substring
-
+        query = query + " ORDER BY hasMultipleLines DESC, displayName"; //Order by has multiline, then displayName
         Cursor c = db.rawQuery(query, null); //_id necessary for adapters
 
         return c;
