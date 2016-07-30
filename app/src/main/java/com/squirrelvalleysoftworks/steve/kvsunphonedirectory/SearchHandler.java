@@ -46,7 +46,7 @@ public class SearchHandler extends SQLiteAssetHelper {
         return c;
     }
 
-    //Need to implement
+
     public Cursor searchByCategory(String category) {
         String query = "SELECT Entries.rowid as _id,Entries.* from Entries, Categories where " +
                 "Entries.displayName = Categories.displayName and Categories.category = " + '"' + category + '"';
@@ -88,6 +88,14 @@ public class SearchHandler extends SQLiteAssetHelper {
             System.out.println(i);
             System.out.println("    " + c.getString(1) + " : " + c.getString(2));
         }
+    }
+
+    // Executes query string and returns the resulting cursor
+    // Will be used to expose the db to other classes
+    public Cursor executeArbitraryQuery(String query) {
+        Cursor c = db.rawQuery(query, null);
+
+        return c;
     }
 
 }
